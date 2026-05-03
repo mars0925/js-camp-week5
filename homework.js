@@ -171,19 +171,23 @@ function isProductInCart(carts, productId) {
  */
 function addToCart(carts, product, quantity) {
   // 請實作此函式
-  const existingCartIndex = carts.findIndex(cart => cart.product.id === product.id);
-  if (existingCartIndex !== -1) {
-    // 產品已存在，合併數量
-    const updatedCarts = [...carts];
-    updatedCarts[existingCartIndex] = {
-      ...updatedCarts[existingCartIndex],
-      quantity: updatedCarts[existingCartIndex].quantity + quantity
-    };
-    return updatedCarts;
+  const index = carts.findIndex(cart=> {cart.product.id === product.id})
+  let newCarts = [...carts]
+  if (index != -1){
+    const currentCart = newCarts[index]
+    newCarts[index] = {
+      ...currentCart,
+      quantity:currentCart.quantity + 1
+    }
   } else {
-    // 產品不存在，新增一筆
-    return [...carts, { id: `cart-${Date.now()}`, product, quantity }];
-  } 
+    newCarts.push({
+      id:`cart-${new Date()}`,
+      product:product,
+      quantity:1
+    })
+  }
+
+  return newCarts
 }
 
 /**
@@ -195,6 +199,23 @@ function addToCart(carts, product, quantity) {
  */
 function updateCartItemQuantity(carts, cartId, newQuantity) {
   // 請實作此函式
+  let newCarts = [...carts]
+  let index = carts.findIndex(cart => cart.id === cartId)
+
+  if (index != -1) {
+    let currentCart = newCarts[index]
+    if (newQuantity <= 0) {
+      newCarts.splice(index, 1)   // 移除商品
+    } else {
+      newCarts[index] = {
+        ...currentCart,
+        quantity:newQuantity
+      }
+    }
+  }
+
+  return newCarts
+
 }
 
 /**
@@ -205,6 +226,7 @@ function updateCartItemQuantity(carts, cartId, newQuantity) {
  */
 function removeFromCart(carts, cartId) {
   // 請實作此函式
+return carts.filter(cart => cart.id !== cartId )
 }
 
 /**
@@ -213,6 +235,7 @@ function removeFromCart(carts, cartId) {
  */
 function clearCart() {
   // 請實作此函式
+  return [];
 }
 
 // ========================================
@@ -226,6 +249,8 @@ function clearCart() {
  */
 function calculateTotalRevenue(orders) {
   // 請實作此函式
+  return orders.filter(order => order.paid)
+  .reduce((total,order)=> total + order.total ,0)
 }
 
 /**
@@ -236,6 +261,7 @@ function calculateTotalRevenue(orders) {
  */
 function filterOrdersByStatus(orders, isPaid) {
   // 請實作此函式
+  return orders.filter(order => order.paid === isPaid)
 }
 
 /**
@@ -251,7 +277,15 @@ function filterOrdersByStatus(orders, isPaid) {
  * }
  */
 function generateOrderReport(orders) {
-  // 請實作此函式
+  const paidOrders = filterOrdersByStatus(orders, true)
+  const unpaidOrders = filterOrdersByStatus(orders, false)
+  return {
+    totalOrders: orders.length,
+    paidOrders: paidOrders.length,
+    unpaidOrders: unpaidOrders.length,
+    totalRevenue: calculateTotalRevenue(orders),
+    averageOrderValue: Math.round(orders.reduce((sum, o) => sum + o.total, 0) / orders.length)
+  }
 }
 
 /**
@@ -264,7 +298,12 @@ function generateOrderReport(orders) {
  * }
  */
 function groupOrdersByPayment(orders) {
-  // 請實作此函式
+  return orders.reduce((groups, order) => {
+    const method = order.user.payment
+    if (!groups[method]) groups[method] = []
+    groups[method].push(order)
+    return groups
+  }, {})
 }
 
 // ========================================
