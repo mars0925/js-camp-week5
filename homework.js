@@ -57,6 +57,7 @@ const orders = [
  */
 function getProductById(products, productId) {
   // 請實作此函式
+  return products.find(product => product.id === productId) || null;
 }
 
 /**
@@ -66,7 +67,8 @@ function getProductById(products, productId) {
  * @returns {Array} - 回傳符合分類的產品陣列，若 category 為 '全部' 則回傳全部產品
  */
 function getProductsByCategory(products, category) {
-  // 請實作此函式
+  if (category === '全部') return products;
+  return products.filter(product => product.category === category);
 }
 
 /**
@@ -77,6 +79,8 @@ function getProductsByCategory(products, category) {
  */
 function getDiscountRate(product) {
   // 請實作此函式
+  let discount = Math.round((product.price / product.origin_price) * 100) / 10;
+  return `${discount}折`;
 }
 
 /**
@@ -86,6 +90,9 @@ function getDiscountRate(product) {
  */
 function getAllCategories(products) {
   // 請實作此函式
+  let categories = products.map(product => product.category);
+  new Set(categories);
+  return [...new Set(categories)];
 }
 
 // ========================================
@@ -99,6 +106,9 @@ function getAllCategories(products) {
  */
 function calculateCartOriginalTotal(carts) {
   // 請實作此函式
+  return carts.reduce((total, cart) => {
+    return total + cart.product.origin_price * cart.quantity;
+  },0);
 }
 
 /**
@@ -108,6 +118,9 @@ function calculateCartOriginalTotal(carts) {
  */
 function calculateCartTotal(carts) {
   // 請實作此函式
+  return carts.reduce((total, cart) => {
+    return total + cart.product.price * cart.quantity;
+  },0);
 }
 
 /**
@@ -117,6 +130,7 @@ function calculateCartTotal(carts) {
  */
 function calculateSavings(carts) {
   // 請實作此函式
+  return calculateCartOriginalTotal(carts) - calculateCartTotal(carts);
 }
 
 /**
@@ -126,6 +140,9 @@ function calculateSavings(carts) {
  */
 function calculateCartItemCount(carts) {
   // 請實作此函式
+  return carts.reduce((total, cart) => {
+    return total + cart.quantity;
+  },0);
 }
 
 /**
@@ -136,6 +153,8 @@ function calculateCartItemCount(carts) {
  */
 function isProductInCart(carts, productId) {
   // 請實作此函式
+  return carts.some((cart) => {return cart.product.id === productId}
+    );
 }
 
 // ========================================
